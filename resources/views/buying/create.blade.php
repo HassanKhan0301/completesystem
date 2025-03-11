@@ -21,13 +21,18 @@
 
     <!-- Form for submitting the data -->
     <form id="buyingForm" method="POST" action="{{ route('buying.store') }}">
-      @csrf <!-- CSRF Token for security, make sure to include this in your form -->
+      @csrf <!-- CSRF Token for security -->
 
-      <!-- Add Order ID (if needed) -->
+      <!-- Order ID -->
       <div class="mb-3">
         <label for="orderId" class="form-label">Order ID</label>
         <input type="hidden" class="form-control" id="orderId" name="orderId" value="{{ $orderId }}" required>
+      </div>
 
+      <!-- Date Input -->
+      <div class="mb-3">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" class="form-control" id="date" name="date" required>
       </div>
 
       <!-- Add Row Button -->

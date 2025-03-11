@@ -13,18 +13,25 @@
         <a class="btn btn-primary" href="{{ route('packing.create') }}">Add Packing</a>
     </div>
 
+    <!-- Search Form -->
+    <form method="GET" action="{{ route('packing.index') }}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="packing_type" class="form-control" placeholder="Search by Packing Type" value="{{ request()->get('packing_type') }}">
+            <button type="submit" class="btn btn-primary ml-2">Search</button>
+        </div>
+    </form>
+
     <!-- Buying Table -->
     <table class="table table-bordered table-hover">
         <thead>
             <tr>
                 <th>#</th>
                 <th>Order ID</th>
-                <th>Cutting Type</th>
-                <th>Cutting Quantity</th>
-         
-                <th>Cutting Price</th>
+                <th>Packing Type</th>
+                <th>Packing Quantity</th>
+                <th>Packing Price</th>
                 <th>Total Amount</th>
-                
+                <th>Date</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -35,15 +42,10 @@
                     <td>{{ $item->orderId }}</td>
                     <td>{{ $item->packing_type }}</td>
                     <td>{{ $item->packing_quantity }}</td>
-              
                     <td>{{ $item->packing_price }}</td>
                     <td>{{ $item->total_amount }}</td>
-                   
+                    <td>{{ \Carbon\Carbon::parse($item->date)->format('d-m-Y') }}</td>
                     <td>
-                        <!-- Edit Button -->
-                       
-
-                        <!-- Delete Button (if you want to allow deleting, you can implement it too) -->
                         <form method="post" action="{{ route('packing.destroy', $item->id) }}">
                             <a href="{{ route('packing.edit', $item->id) }}"> <i class="fa-solid fa-edit text-success"></i> </a>
                             <a href="{{ route('packing.show', $item->id) }}"> <i class="fa-solid fa-eye text-info"></i> </a>
@@ -67,7 +69,4 @@
     </div>
 </div>
 
-
-
 @endsection
-

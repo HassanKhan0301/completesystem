@@ -6,13 +6,19 @@
 
     <!-- Form for submitting the data -->
     <form id="buyingForm" method="POST" action="{{ route('buying.update', $buyingOrder->id) }}">
-        @csrf <!-- CSRF Token for security -->
-        @method('PUT') <!-- Use PUT method to update -->
+        @csrf
+        @method('PUT')
 
         <!-- Add Order ID -->
         <div class="mb-3">
             <label for="orderId" class="form-label">Order ID</label>
             <input type="text" class="form-control" id="orderId" name="orderId" value="{{ $buyingOrder->orderId }}" required>
+        </div>
+
+        <!-- Add Date Field -->
+        <div class="mb-3">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" class="form-control" id="date" name="date" value="{{ \Carbon\Carbon::parse($buyingOrder->date)->format('Y-m-d') }}" required>
         </div>
 
         <!-- Add Row Button -->
@@ -39,7 +45,7 @@
                         <td><input type="number" class="form-control quantity" name="quantity[]" value="{{ $buying->quantity }}" min="1"></td>
                         <td><input type="text" class="form-control unit" name="unit[]" value="{{ $buying->unit }}"></td>
                         <td><input type="number" class="form-control price" name="price[]" value="{{ $buying->price }}" min="0" step="0.01"></td>
-                        <td><input type="number" class="form-control total" name="total[]" value="{{ $buying->total_amount }}" readonly></td>
+                        <td><input type="number" class="form-control total" name="total[]" value="{{ number_format($buying->quantity * $buying->price, 2) }}" readonly></td>
                         <td><button class="btn btn-danger btn-sm deleteRow">Delete</button></td>
                     </tr>
                 @endforeach
@@ -51,47 +57,56 @@
     </form>
 </div>
 
-<!-- jQuery Script to add rows -->
+<!-- jQuery Script -->
 <script>
-    $(document).ready(function() {
-        let rowCount = {{ count($buyingMaterials ?? []) }};
+  $(document).ready(function() {
+    let rowCount = $("#myTable tbody tr").length;
 
-        // Add row on button click
-        $("#addRow").click(function(e) {
-            e.preventDefault();
-            rowCount++; // Increment row count for unique id
+    // Add row on button click
+    $("#addRow").click(function(e) {
+        e.preventDefault();
+        rowCount++;
 
-            // Create a new row with inputs for Material, Quantity, Unit, Price, and Total Amount
-            let newRow = `<tr id="row${rowCount}">
-                            <td>${rowCount}</td>
-                            <td><input type="text" class="form-control material" name="material[]" placeholder="Enter Material"></td>
-                            <td><input type="number" class="form-control quantity" name="quantity[]" placeholder="Enter Quantity" min="1"></td>
-                            <td><input type="text" class="form-control unit" name="unit[]" placeholder="Enter Unit"></td>
-                            <td><input type="number" class="form-control price" name="price[]" placeholder="Enter Price" min="0" step="0.01"></td>
-                            <td><input type="number" class="form-control total" name="total[]" placeholder="Total Amount" readonly></td>
-                            <td><button class="btn btn-danger btn-sm deleteRow">Delete</button></td>
-                        </tr>`;
+        let newRow = `<tr id="row${rowCount}">
+                        <td>${rowCount}</td>
+                        <td><input type="text" class="form-control material" name="material[]" placeholder="Enter Material"></td>
+                        <td><input type="number" class="form-control quantity" name="quantity[]" placeholder="Enter Quantity" min="1"></td>
+                        <td><input type="text" class="form-control unit" name="unit[]" placeholder="Enter Unit"></td>
+                        <td><input type="number" class="form-control price" name="price[]" placeholder="Enter Price" min="0" step="0.01"></td>
+                        <td><input type="number" class="form-control total" name="total[]" placeholder="Total Amount" readonly></td>
+                        <td><button class="btn btn-danger btn-sm deleteRow">Delete</button></td>
+                    </tr>`;
 
-            // Append the new row to the table body
-            $("#myTable tbody").append(newRow);
-        });
-
-        // Calculate total amount when Quantity or Price changes
-        $(document).on("input", ".quantity, .price", function() {
-            let row = $(this).closest('tr');
-            let quantity = parseFloat(row.find(".quantity").val()) || 0;
-            let price = parseFloat(row.find(".price").val()) || 0;
-            let total = (quantity * price).toFixed(2);
-            
-            // Set total in the Total Amount column
-            row.find(".total").val(total);
-        });
-
-        // Delete row functionality
-        $(document).on("click", ".deleteRow", function() {
-            $(this).closest('tr').remove(); // Remove the row
-        });
+        $("#myTable tbody").append(newRow);
     });
+
+    // Calculate total amount when Quantity or Price changes
+    function updateTotal(row) {
+        let quantity = parseFloat(row.find(".quantity").val()) || 0;
+        let price = parseFloat(row.find(".price").val()) || 0;
+        let total = (quantity * price).toFixed(2);
+        row.find(".total").val(total);
+    }
+
+    $(document).on("input", ".quantity, .price", function() {
+        let row = $(this).closest('tr');
+        updateTotal(row);
+    });
+
+    // Delete row functionality
+    $(document).on("click", ".deleteRow", function(e) {
+        e.preventDefault();
+        $(this).closest('tr').remove();
+        updateRowNumbers();
+    });
+
+    function updateRowNumbers() {
+        $("#myTable tbody tr").each(function(index) {
+            $(this).find("td:first").text(index + 1);
+        });
+    }
+});
+
 </script>
 
 @endsection

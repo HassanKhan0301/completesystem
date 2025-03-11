@@ -10,16 +10,33 @@ class CuttingController extends Controller
 {
     public function index(Request $request)
     {
-        $orderId = $request->orderId; // Get orderId from URL
+        // Get orderId from URL
+        $orderId = $request->orderId; 
+        
+        // Get cutting_type from search query
+        $cuttingType = $request->cutting_type; 
     
-        if ($orderId) {
-            $cutting = Cutting::where('orderId', $orderId)->orderBy('created_at', 'DESC')->paginate(25);
+        // Apply filters if cutting_type is provided
+        if ($orderId && $cuttingType) {
+            $cutting = Cutting::where('orderId', $orderId)
+                              ->where('cutting_type', 'LIKE', "%{$cuttingType}%")
+                              ->orderBy('created_at', 'DESC')
+                              ->paginate(25);
+        } elseif ($orderId) {
+            $cutting = Cutting::where('orderId', $orderId)
+                              ->orderBy('created_at', 'DESC')
+                              ->paginate(25);
+        } elseif ($cuttingType) {
+            $cutting = Cutting::where('cutting_type', 'LIKE', "%{$cuttingType}%")
+                              ->orderBy('created_at', 'DESC')
+                              ->paginate(25);
         } else {
             $cutting = Cutting::orderBy('created_at', 'DESC')->paginate(25);
         }
     
         return view('cutting.index', compact('cutting'));
     }
+    
 
     public function create(Request $request)
     {
@@ -29,6 +46,7 @@ class CuttingController extends Controller
 
     public function store(Request $request)
     {
+        
         // Validate the request data
         $request->validate([
             'orderId' => 'required|string',
@@ -36,6 +54,7 @@ class CuttingController extends Controller
             'cutting_quantity' => 'required|array',
             'cutting_price' => 'required|array',
             'total' => 'required|array',
+            'date' => 'required|date', // Validate date field
         ]);
 
         // Loop through the submitted cutting details and store them
@@ -46,6 +65,7 @@ class CuttingController extends Controller
                 'cutting_quantity' => $request->cutting_quantity[$key] ?? 0,
                 'cutting_price' => $request->cutting_price[$key] ?? 0.00,
                 'total_amount' => $request->total[$key] ?? 0.00,
+                'date' => $request->date, // Store the date field
             ]);
         }
         return redirect()->route('order.show', ['orderId' => $request->orderId])
@@ -88,7 +108,8 @@ class CuttingController extends Controller
             $newStitch->cutting_type = $cutting_type;
             $newStitch->cutting_quantity = $request->cutting_quantity[$index];
             $newStitch->cutting_price = $request->cutting_price[$index];
-            $newStitch->total_amount = $request->total[$index];
+            $newStitch->total_amount = $request->cutting_quantity[$index] * $request->cutting_price[$index];
+            $newStitch->date = $request->date; // Ensure the date is passed to each stitching record
             $newStitch->save();
         }
     

@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('packings', function (Blueprint $table) {
+        Schema::create('buyings', function (Blueprint $table) {
             $table->id();
             $table->string('orderId')->nullable();
-            $table->string('packing_type')->nullable();
-            $table->string('packing_price')->nullable();
-            $table->string('packing_quantity')->nullable();
+            $table->string('material')->nullable(); // Store individual materials
+            $table->string('quantity')->nullable();
+            $table->string('unit')->nullable();
+            $table->string('price')->nullable();
             $table->string('total_amount')->nullable();
+            $table->date('date')->nullable(); // Store the date of the buying
             $table->timestamps();
         });
     }
@@ -27,6 +29,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('packings');
+        Schema::dropIfExists('buyings');
     }
 };
+
+

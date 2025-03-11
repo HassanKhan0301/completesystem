@@ -5,48 +5,55 @@
     <h2 class="mb-4">Edit delivery</h2>
 
     <form id="buyingForm" method="POST" action="{{ route('delivery.update', $deliveryOrder->id) }}">
-        @csrf
-        @method('PUT')
+    @csrf
+    @method('PUT')
 
-        <!-- Order ID -->
-        <div class="mb-3">
-            <label for="orderId" class="form-label">Order ID</label>
-            <input type="text" class="form-control" id="orderId" name="orderId" value="{{ $deliveryOrder->orderId }}" required>
-        </div>
+    <!-- Order ID -->
+    <div class="mb-3">
+        <label for="orderId" class="form-label">Order ID</label>
+        <input type="text" class="form-control" id="orderId" name="orderId" value="{{ $deliveryOrder->orderId }}" required>
+    </div>
 
-        <!-- Add Row Button -->
-        <button id="addRow" class="btn btn-primary mb-3">Add Row</button>
+    <!-- Date Field -->
+    <div class="mb-3">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" class="form-control" id="date" name="date" value="{{ $deliveryOrder->date->format('Y-m-d') }}" required>
 
-        <!-- Table -->
-        <table class="table table-bordered" id="myTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th> Type</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                    <th>Total Amount</th>
-                    <th>Action</th>
+    </div>
+
+    <!-- Add Row Button -->
+    <button id="addRow" class="btn btn-primary mb-3">Add Row</button>
+
+    <!-- Table -->
+    <table class="table table-bordered" id="myTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total Amount</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($deliveryMaterials as $index => $pack)
+                <tr id="row{{ $index }}">
+                    <td>{{ $index + 1 }}</td>
+                    <td><input type="text" class="form-control" name="delivery_type[]" value="{{ $pack->delivery_type }}" required></td>
+                    <td><input type="number" class="form-control quantity" name="delivery_quantity[]" value="{{ $pack->delivery_quantity }}" min="1"></td>
+                    <td><input type="number" class="form-control price" name="delivery_price[]" value="{{ $pack->delivery_price }}" min="0" step="0.01"></td>
+                    <td><input type="number" class="form-control total" name="total[]" value="{{ $pack->total_amount }}" readonly></td>
+                    <td><button class="btn btn-danger btn-sm deleteRow">Delete</button></td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach($deliveryMaterials as $index => $pack)
-                    <tr id="row{{ $index }}">
-                        <td>{{ $index + 1 }}</td>
-                        <td><input type="text" class="form-control" name="delivery_type[]" value="{{ $pack->delivery_type }}" required></td>
-                        <td><input type="number" class="form-control quantity" name="delivery_quantity[]" value="{{ $pack->delivery_quantity }}" min="1"></td>
-                        <td><input type="number" class="form-control price" name="delivery_price[]" value="{{ $pack->delivery_price }}" min="0" step="0.01"></td>
-                        <td><input type="number" class="form-control total" name="total[]" value="{{ $pack->total_amount }}" readonly></td>
-                        <td><button class="btn btn-danger btn-sm deleteRow">Delete</button></td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+            @endforeach
+        </tbody>
+    </table>
 
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-success mt-3">Update</button>
-    </form>
-</div>
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-success mt-3">Update</button>
+</form>
+
 
 <script>
     $(document).ready(function() {

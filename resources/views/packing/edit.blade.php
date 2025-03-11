@@ -13,6 +13,12 @@
             <label for="orderId" class="form-label">Order ID</label>
             <input type="text" class="form-control" id="orderId" name="orderId" value="{{ $packingOrder->orderId }}" required>
         </div>
+        <!-- Date Field -->
+<div class="mb-3">
+    <label for="date" class="form-label">Date</label>
+    <input type="date" class="form-control" id="date" name="date" value="{{ $packingOrder->date }}" required>
+</div>
+
 
         <!-- Add Row Button -->
         <button id="addRow" class="btn btn-primary mb-3">Add Row</button>
@@ -50,37 +56,49 @@
 
 <script>
     $(document).ready(function() {
-        let rowCount = {{ count($packingMaterials ?? []) }};
+    let rowCount = {{ count($packingMaterials ?? []) }};
 
-        $("#addRow").click(function(e) {
-            e.preventDefault();
-            rowCount++;
+    // Add new row functionality
+    $("#addRow").click(function(e) {
+        e.preventDefault();
+        rowCount++;
 
-            let newRow = `<tr id="row${rowCount}">
-                            <td>${rowCount}</td>
-                            <td><input type="text" class="form-control" name="packing_type[]" placeholder="Enter Stitching Type" required></td>
-                            <td><input type="number" class="form-control quantity" name="packing_quantity[]" placeholder="Enter Quantity" min="1"></td>
-                            <td><input type="number" class="form-control price" name="packing_price[]" placeholder="Enter Price" min="0" step="0.01"></td>
-                            <td><input type="number" class="form-control total" name="total[]" placeholder="Total Amount" readonly></td>
-                            <td><button class="btn btn-danger btn-sm deleteRow">Delete</button></td>
-                        </tr>`;
+        let newRow = `<tr id="row${rowCount}">
+                        <td>${rowCount}</td>
+                        <td><input type="text" class="form-control" name="packing_type[]" placeholder="Enter Stitching Type" required></td>
+                        <td><input type="number" class="form-control quantity" name="packing_quantity[]" placeholder="Enter Quantity" min="1"></td>
+                        <td><input type="number" class="form-control price" name="packing_price[]" placeholder="Enter Price" min="0" step="0.01"></td>
+                        <td><input type="number" class="form-control total" name="total[]" placeholder="Total Amount" readonly></td>
+                        <td><button class="btn btn-danger btn-sm deleteRow">Delete</button></td>
+                    </tr>`;
 
-            $("#myTable tbody").append(newRow);
-        });
-
-        $(document).on("input", ".quantity, .price", function() {
-            let row = $(this).closest('tr');
-            let quantity = parseFloat(row.find(".quantity").val()) || 0;
-            let price = parseFloat(row.find(".price").val()) || 0;
-            let total = (quantity * price).toFixed(2);
-
-            row.find(".total").val(total);
-        });
-
-        $(document).on("click", ".deleteRow", function() {
-            $(this).closest('tr').remove();
-        });
+        $("#myTable tbody").append(newRow);
     });
+
+    // Recalculate total on quantity or price change
+    $(document).on("input", ".quantity, .price", function() {
+        let row = $(this).closest('tr');
+        let quantity = parseFloat(row.find(".quantity").val()) || 0;
+        let price = parseFloat(row.find(".price").val()) || 0;
+        let total = (quantity * price).toFixed(2);
+
+        row.find(".total").val(total);
+    });
+
+    // Delete row functionality
+    $(document).on("click", ".deleteRow", function() {
+        $(this).closest('tr').remove();
+        recalculateRowNumbers(); // Recalculate row numbers after a row is deleted
+    });
+
+    // Recalculate row numbers after deletion or addition
+    function recalculateRowNumbers() {
+        $("#myTable tbody tr").each(function(index) {
+            $(this).find("td:first").text(index + 1); // Update row number
+        });
+    }
+});
+
 </script>
 
 @endsection

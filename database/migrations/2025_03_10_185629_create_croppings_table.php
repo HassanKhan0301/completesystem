@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('deliverys', function (Blueprint $table) {
+        Schema::create('croppings', function (Blueprint $table) {
             $table->id();
             $table->string('orderId')->nullable();
-            $table->string('delivery_type')->nullable();
-            $table->string('delivery_price')->nullable();
-            $table->string('delivery_quantity')->nullable();
+            $table->string('cropping_type')->nullable();
+            $table->string('cropping_price')->nullable();
+            $table->string('cropping_quantity')->nullable();
             $table->string('total_amount')->nullable();
+            $table->date('date')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +28,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('deliverys');
+        Schema::dropIfExists('croppings');
     }
 };
+
+

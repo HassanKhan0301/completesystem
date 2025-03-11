@@ -17,7 +17,7 @@
 </head>
 <body>
   <div class="container mt-5">
-    <h2 class="mb-4">Cutting</h2>
+    <h2 class="mb-4">packing</h2>
 
     <!-- Form for submitting the data -->
     <form id="buyingForm" method="POST" action="{{ route('packing.store') }}">
@@ -28,7 +28,12 @@
         <label for="orderId" class="form-label">Order ID</label>
         <input type="hidden" class="form-control" id="orderId" name="orderId" value="{{ $orderId }}" required>
       </div>
+      
 
+       <div class="mb-3">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" class="form-control" id="date" name="date" required>
+      </div>
       <!-- Add Row Button -->
       <button id="addRow" class="btn btn-primary mb-3">Add Row</button>
 

@@ -9,6 +9,14 @@
         <a class="btn btn-primary q-1" href="{{ route('order.create') }}"> Add Orders</a>
     </div>
 
+    <!-- Search Bar -->
+    <form method="GET" action="{{ route('order.index') }}" class="mb-4">
+        <div class="d-flex justify-content-between">
+            <input type="text" name="search" class="form-control" placeholder="Search by Vendor Name" value="{{ request()->search }}">
+            <button type="submit" class="btn btn-primary ml-2">Search</button>
+        </div>
+    </form>
+
     <table id="#example2" class="table table-bordered table-striped">
         <thead>
             <tr>
@@ -56,5 +64,8 @@
             @endforeach
         </tbody>
     </table>
+
+    <!-- Pagination -->
+    {{ $order->links() }}
 </div>
 @endsection

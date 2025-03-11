@@ -9,17 +9,22 @@ use App\Models\Order;
 class DeliveryController extends Controller
 {
     public function index(Request $request)
-    {
-        $orderId = $request->orderId; // Get orderId from URL
-    
-        if ($orderId) {
-            $delivery = Delivery::where('orderId', $orderId)->orderBy('created_at', 'DESC')->paginate(25);
-        } else {
-            $delivery = Delivery::orderBy('created_at', 'DESC')->paginate(25);
-        }
-    
-        return view('delivery.index', compact('delivery'));
+{
+    // Get the search query for delivery_type
+    $search = $request->get('search'); 
+
+    // Filter the delivery records based on the search query
+    if ($search) {
+        $delivery = Delivery::where('delivery_type', 'like', '%' . $search . '%')
+                            ->orderBy('created_at', 'DESC')
+                            ->paginate(25);
+    } else {
+        $delivery = Delivery::orderBy('created_at', 'DESC')->paginate(25);
     }
+
+    return view('delivery.index', compact('delivery'));
+}
+
     public function create(Request $request)
     {
         $orderId = $request->orderId; // Get orderId from URL
@@ -36,6 +41,7 @@ class DeliveryController extends Controller
             'delivery_quantity' => 'required|array',
             'delivery_price' => 'required|array',
             'total' => 'required|array',
+            'date' => 'required|date',
         ]);
 
         // Loop through the submitted cutting details and store them
@@ -46,6 +52,7 @@ class DeliveryController extends Controller
                 'delivery_quantity' => $request->delivery_quantity[$key] ?? 0,
                 'delivery_price' => $request->delivery_price[$key] ?? 0.00,
                 'total_amount' => $request->total[$key] ?? 0.00,
+                'date' => $request->date,
             ]);
         }
 
@@ -67,32 +74,39 @@ class DeliveryController extends Controller
     
         return view('delivery.edit', compact('deliveryOrder', 'deliveryMaterials'));
     }
+
+    
     public function update(Request $request, $id)
     {
         // Find the order by ID
         $deliveryOrder = Delivery::find($id);
     
         if (!$deliveryOrder) {
-            return redirect()->route('stitch.index')->with('error', 'Stitching record not found.');
+            return redirect()->route('delivery.index')->with('error', 'Delivery order not found.');
         }
+    
+        // Update the date
+        $deliveryOrder->date = $request->date;
+        $deliveryOrder->save();
     
         // Delete existing materials for this order (but keep the same orderId)
         Delivery::where('orderId', $deliveryOrder->orderId)->delete();
     
-        // Insert new records for each stitching type
+        // Insert new records for each delivery type
         foreach ($request->delivery_type as $index => $delivery_type) {
-            $newStitch = new Delivery();
-            $newStitch->orderId = $request->orderId;
-            $newStitch->delivery_type = $delivery_type;
-            $newStitch->delivery_quantity = $request->delivery_quantity[$index];
-            $newStitch->delivery_price = $request->delivery_price[$index];
-            $newStitch->total_amount = $request->total[$index];
-            $newStitch->save();
+            $newDelivery = new Delivery();
+            $newDelivery->orderId = $request->orderId;
+            $newDelivery->delivery_type = $delivery_type;
+            $newDelivery->delivery_quantity = $request->delivery_quantity[$index];
+            $newDelivery->delivery_price = $request->delivery_price[$index];
+            $newDelivery->total_amount = $request->delivery_quantity[$index] * $request->delivery_price[$index]; // Calculating total amount
+            $newDelivery->date = $request->date; // Ensure date is also updated
+            $newDelivery->save();
         }
     
-        return redirect()->route('delivery.index')->with('success', 'Stitching order updated successfully.');
+        return redirect()->route('delivery.index')->with('success', 'Delivery order updated successfully.');
     }
-
+    
     public function show($id)
     {
         // Find the delivery record by ID

@@ -10,16 +10,19 @@ class PackingController extends Controller
 {
     public function index(Request $request)
     {
-        $orderId = $request->orderId; // Get orderId from URL
+        $packingType = $request->get('packing_type'); // Get search query
     
-        if ($orderId) {
-            $packing = Packing::where('orderId', $orderId)->orderBy('created_at', 'DESC')->paginate(25);
+        if ($packingType) {
+            $packing = Packing::where('packing_type', 'like', '%' . $packingType . '%')
+                              ->orderBy('created_at', 'DESC')
+                              ->paginate(25);
         } else {
             $packing = Packing::orderBy('created_at', 'DESC')->paginate(25);
         }
     
         return view('packing.index', compact('packing'));
     }
+    
     public function create(Request $request)
     {
         $orderId = $request->orderId; // Get orderId from URL
@@ -36,6 +39,7 @@ class PackingController extends Controller
             'packing_quantity' => 'required|array',
             'packing_price' => 'required|array',
             'total' => 'required|array',
+            'date' => 'required|date',
         ]);
 
         // Loop through the submitted cutting details and store them
@@ -46,6 +50,7 @@ class PackingController extends Controller
                 'packing_quantity' => $request->packing_quantity[$key] ?? 0,
                 'packing_price' => $request->packing_price[$key] ?? 0.00,
                 'total_amount' => $request->total[$key] ?? 0.00,
+                'date' => $request->date, // Store the date field
             ]);
         }
 
@@ -69,29 +74,41 @@ class PackingController extends Controller
     }
     public function update(Request $request, $id)
     {
-        // Find the order by ID
+        // Validate the request
+        $request->validate([
+            'orderId' => 'required|string',
+            'packing_type' => 'required|array',
+            'packing_quantity' => 'required|array',
+            'packing_price' => 'required|array',
+            'total' => 'required|array',
+            'date' => 'required|date',
+        ]);
+    
+        // Find the original order
         $packingOrder = Packing::find($id);
     
         if (!$packingOrder) {
-            return redirect()->route('stitch.index')->with('error', 'Stitching record not found.');
+            return redirect()->route('packing.index')->with('error', 'Packing record not found.');
         }
     
-        // Delete existing materials for this order (but keep the same orderId)
+        // Delete existing materials for this orderId
         Packing::where('orderId', $packingOrder->orderId)->delete();
     
-        // Insert new records for each stitching type
+        // Insert updated records
         foreach ($request->packing_type as $index => $packing_type) {
-            $newStitch = new Packing();
-            $newStitch->orderId = $request->orderId;
-            $newStitch->packing_type = $packing_type;
-            $newStitch->packing_quantity = $request->packing_quantity[$index];
-            $newStitch->packing_price = $request->packing_price[$index];
-            $newStitch->total_amount = $request->total[$index];
-            $newStitch->save();
+            Packing::create([
+                'orderId' => $request->orderId,
+                'packing_type' => $packing_type,
+                'packing_quantity' => $request->packing_quantity[$index],
+                'packing_price' => $request->packing_price[$index],
+                'total_amount' => $request->packing_quantity[$index] * $request->packing_price[$index], // Ensure total amount calculation
+                'date' => $request->date, // Include date in update
+            ]);
         }
     
-        return redirect()->route('packing.index')->with('success', 'Stitching order updated successfully.');
+        return redirect()->route('packing.index')->with('success', 'Packing order updated successfully.');
     }
+    
 
     public function show($id)
     {

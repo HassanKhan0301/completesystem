@@ -9,17 +9,33 @@ use App\Models\Order;
 class BuyingController extends Controller
 {
     public function index(Request $request)
-    {
-        $orderId = $request->orderId; // Get orderId from URL
-    
-        if ($orderId) {
+{
+    $orderId = $request->orderId; // Get orderId from URL
+    $search = $request->get('search'); // Get the search query
+
+    if ($orderId) {
+        // If orderId is present, filter by orderId
+        if ($search) {
+            // If search term is present, filter by material
+            $buying = Buying::where('orderId', $orderId)
+                            ->where('material', 'like', '%' . $search . '%')
+                            ->orderBy('created_at', 'DESC')
+                            ->paginate(25);
+        } else {
             $buying = Buying::where('orderId', $orderId)->orderBy('created_at', 'DESC')->paginate(25);
+        }
+    } else {
+        // If no orderId, apply the search globally
+        if ($search) {
+            $buying = Buying::where('material', 'like', '%' . $search . '%')->orderBy('created_at', 'DESC')->paginate(25);
         } else {
             $buying = Buying::orderBy('created_at', 'DESC')->paginate(25);
         }
-    
-        return view('buying.index', compact('buying'));
     }
+
+    return view('buying.index', compact('buying', 'search'));
+}
+
     
 
     public function create(Request $request)
@@ -39,6 +55,7 @@ class BuyingController extends Controller
             'price' => 'required|array',
             'unit' => 'required|array',
             'total' => 'required|array',
+            'date' => 'required|date', // Validate date field
         ]);
 
         // Loop through the submitted cutting details and store them
@@ -50,6 +67,7 @@ class BuyingController extends Controller
                 'price' => $request->price[$key] ?? 0.00, // Fix this
                 'quantity' => $request->quantity[$key] ?? 0, // Fix this
                 'total_amount' => $request->total[$key] ?? 0.00, // Fix this
+                'date' => $request->date, // Store the date field
             ]);
         }
         return redirect()->route('order.show', ['orderId' => $request->orderId])
@@ -72,12 +90,11 @@ class BuyingController extends Controller
         return view('buying.edit', compact('buyingOrder', 'buyingMaterials'));
     }
     
-
     public function update(Request $request, $id)
     {
         // Find the order by ID
         $buyingOrder = Buying::find($id);
-    
+        
         if (!$buyingOrder) {
             return redirect()->route('buying.index')->with('error', 'Buying record not found.');
         }
@@ -93,13 +110,19 @@ class BuyingController extends Controller
             $newBuying->unit = $request->unit[$index];
             $newBuying->price = $request->price[$index];
             $newBuying->quantity = $request->quantity[$index];
-            $newBuying->total_amount = $request->total[$index];
+    
+            // Calculate total amount dynamically
+            $newBuying->total_amount = $request->quantity[$index] * $request->price[$index];
+    
+            // Add the date
+            $newBuying->date = $request->date;
     
             $newBuying->save();
         }
     
         return redirect()->route('buying.index')->with('success', 'Buying data updated successfully.');
     }
+        
     
     public function destroy(string $id)
     {

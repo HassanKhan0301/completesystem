@@ -29,6 +29,11 @@
         <input type="hidden" class="form-control" id="orderId" name="orderId" value="{{ $orderId }}" required>
       </div>
 
+       <div class="mb-3">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" class="form-control" id="date" name="date" required>
+      </div>
+
       <!-- Add Row Button -->
       <button id="addRow" class="btn btn-primary mb-3">Add Row</button>
 

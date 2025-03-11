@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-5">
-    <h2 class="mb-4">Edit Stitching</h2>
+    <h2 class="mb-4">Edit Croppping</h2>
 
     <form id="buyingForm" method="POST" action="{{ route('crop.update', $croppingOrder->id) }}">
         @csrf
@@ -14,6 +14,12 @@
             <input type="text" class="form-control" id="orderId" name="orderId" value="{{ $croppingOrder->orderId }}" required>
         </div>
 
+        <!-- Date Field -->
+        <div class="mb-3">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" class="form-control" id="date" name="date" value="{{ $croppingOrder->date }}" required>
+        </div>
+
         <!-- Add Row Button -->
         <button id="addRow" class="btn btn-primary mb-3">Add Row</button>
 
@@ -22,7 +28,7 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th> Type</th>
+                    <th>Type</th>
                     <th>Quantity</th>
                     <th>Price</th>
                     <th>Total Amount</th>
@@ -37,7 +43,7 @@
                         <td><input type="number" class="form-control quantity" name="cropping_quantity[]" value="{{ $crop->cropping_quantity }}" min="1"></td>
                         <td><input type="number" class="form-control price" name="cropping_price[]" value="{{ $crop->cropping_price }}" min="0" step="0.01"></td>
                         <td><input type="number" class="form-control total" name="total[]" value="{{ $crop->total_amount }}" readonly></td>
-                        <td><button class="btn btn-danger btn-sm deleteRow">Delete</button></td>
+                        <td><button type="button" class="btn btn-danger btn-sm deleteRow">Delete</button></td>
                     </tr>
                 @endforeach
             </tbody>
@@ -50,8 +56,9 @@
 
 <script>
     $(document).ready(function() {
-        let rowCount = {{ count($stitchingMaterials ?? []) }};
+        let rowCount = {{ count($croppingMaterials ?? []) }};
 
+        // Add Row
         $("#addRow").click(function(e) {
             e.preventDefault();
             rowCount++;
@@ -62,12 +69,13 @@
                             <td><input type="number" class="form-control quantity" name="cropping_quantity[]" placeholder="Enter Quantity" min="1"></td>
                             <td><input type="number" class="form-control price" name="cropping_price[]" placeholder="Enter Price" min="0" step="0.01"></td>
                             <td><input type="number" class="form-control total" name="total[]" placeholder="Total Amount" readonly></td>
-                            <td><button class="btn btn-danger btn-sm deleteRow">Delete</button></td>
+                            <td><button type="button" class="btn btn-danger btn-sm deleteRow">Delete</button></td>
                         </tr>`;
 
             $("#myTable tbody").append(newRow);
         });
 
+        // Calculate Total Amount when Quantity or Price is Changed
         $(document).on("input", ".quantity, .price", function() {
             let row = $(this).closest('tr');
             let quantity = parseFloat(row.find(".quantity").val()) || 0;
@@ -77,6 +85,7 @@
             row.find(".total").val(total);
         });
 
+        // Delete Row
         $(document).on("click", ".deleteRow", function() {
             $(this).closest('tr').remove();
         });

@@ -9,17 +9,20 @@ use App\Models\Order;
 class PrintController extends Controller
 {
     public function index(Request $request)
-    {
-        $orderId = $request->orderId; // Get orderId from URL
-    
-        if ($orderId) {
-            $printing = Printt::where('orderId', $orderId)->orderBy('created_at', 'DESC')->paginate(25);
-        } else {
-            $printing = Printt::orderBy('created_at', 'DESC')->paginate(25);
-        }
-    
-        return view('print.index', compact('printing'));
+{
+    $search = $request->search;
+
+    if ($search) {
+        $printing = Printt::where('printing_type', 'LIKE', "%{$search}%")
+                          ->orderBy('created_at', 'DESC')
+                          ->paginate(25);
+    } else {
+        $printing = Printt::orderBy('created_at', 'DESC')->paginate(25);
     }
+
+    return view('print.index', compact('printing'));
+}
+
 
     public function create(Request $request)
     {
@@ -35,6 +38,7 @@ class PrintController extends Controller
             'printing_quantity' => 'required|array',
             'printing_price' => 'required|array',
             'total' => 'required|array',
+            'date' => 'required|date',
         ]);
 
         foreach ($request->printing_type as $key => $type) {
@@ -44,6 +48,7 @@ class PrintController extends Controller
                 'printing_quantity' => $request->printing_quantity[$key] ?? 0,
                 'printing_price' => $request->printing_price[$key] ?? 0.00,
                 'total_amount' => $request->total[$key] ?? 0.00,
+                'date' => $request->date,
 
                 
                 
@@ -75,24 +80,29 @@ class PrintController extends Controller
         $printingOrder = Printt::find($id);
     
         if (!$printingOrder) {
-            return redirect()->route('print.index')->with('error', 'Stitching record not found.');
+            return redirect()->route('print.index')->with('error', 'Printing record not found.');
         }
     
         // Delete existing materials for this order (but keep the same orderId)
         Printt::where('orderId', $printingOrder->orderId)->delete();
     
-        // Insert new records for each stitching type
+        // Insert new records for each printing type
         foreach ($request->printing_type as $index => $printing_type) {
-            $newStitch = new Printt();
-            $newStitch->orderId = $request->orderId;
-            $newStitch->printing_type = $printing_type;
-            $newStitch->printing_quantity = $request->printing_quantity[$index];
-            $newStitch->printing_price = $request->printing_price[$index];
-            $newStitch->total_amount = $request->total[$index];
-            $newStitch->save();
+            $quantity = $request->printing_quantity[$index] ?? 0;
+            $price = $request->printing_price[$index] ?? 0.00;
+            $totalAmount = $quantity * $price;
+    
+            Printt::create([
+                'orderId' => $request->orderId,
+                'printing_type' => $printing_type,
+                'printing_quantity' => $quantity,
+                'printing_price' => $price,
+                'total_amount' => $totalAmount,
+                'date' => $request->date, // Ensure date is saved
+            ]);
         }
     
-        return redirect()->route('print.index')->with('success', 'Stitching order updated successfully.');
+        return redirect()->route('print.index')->with('success', 'Printing order updated successfully.');
     }
 
     public function show($id)

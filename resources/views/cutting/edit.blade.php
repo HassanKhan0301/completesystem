@@ -14,6 +14,12 @@
             <input type="text" class="form-control" id="orderId" name="orderId" value="{{ $cuttingOrder->orderId }}" required>
         </div>
 
+        <!-- Date -->
+        <div class="mb-3">
+            <label for="orderDate" class="form-label">Order Date</label>
+            <input type="date" class="form-control" id="orderDate" name="orderDate" value="{{ old('orderDate', $cuttingOrder->order_date) }}" required>
+        </div>
+
         <!-- Add Row Button -->
         <button id="addRow" class="btn btn-primary mb-3">Add Row</button>
 

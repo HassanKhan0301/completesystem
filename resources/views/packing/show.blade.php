@@ -15,20 +15,21 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Material</th>
+                            <th>packing Type</th>
                                 <th>Quantity</th>
-                                <th>Unit</th>
                                 <th>Price</th>
                                 <th>Total Amount</th>
+                                <th>Date</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>{{ $packing->material }}</td>
-                                <td>{{ $packing->quantity }}</td>
-                                <td>{{ $packing->unit }}</td>
+                              <td>{{$packing->packing_type}}</td>
+                                <td>{{ $packing->packing_quantity }}</td>
+                              
                                 <td>{{ number_format($packing->price, 2) }}</td>
                                 <td>{{ number_format($packing->total_amount, 2) }}</td>
+                                <td>{{ \Carbon\Carbon::parse($packing->date)->format('d M Y') }}</td> <!-- Displaying formatted date -->
                             </tr>
                         </tbody>
                     </table>
@@ -49,20 +50,25 @@
                             <td>{{ $order->id }}</td>
                         </tr>
                         <tr>
-                            <th>Material</th>
-                            <td>{{ $packing->material }}</td>
+                            <th>Type</th>
+                            <td>{{ $packing->packing_type }}</td>
                         </tr>
+                      
                         <tr>
                             <th>Price</th>
                             <td>{{ number_format($packing->price, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Quantity</th>
-                            <td>{{ $packing->quantity }}</td>
+                            <td>{{ $packing->packing_quantity }}</td>
                         </tr>
                         <tr>
                             <th>Total Amount</th>
                             <td>{{ number_format($packing->total_amount, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date</th>  <!-- Add Date Field Here -->
+                            <td>{{ \Carbon\Carbon::parse($packing->date)->format('d-m-Y') }}</td>  <!-- Display Date -->
                         </tr>
                     </table>
                 </div>

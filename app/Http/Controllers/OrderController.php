@@ -45,11 +45,22 @@ class OrderController extends Controller
     }
 
     
-    public function index()
+    public function index(Request $request)
     {
-        $order = Order::orderBy('created_at','DESC')->paginate(25);
+        // Check if search query is passed, then filter by vendor_name
+        $query = Order::orderBy('created_at', 'DESC');
+        
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where('vendor_name', 'like', '%' . $request->search . '%');
+        }
+    
+        // Paginate the results
+        $order = $query->paginate(25);
+    
+        // Return the view with the filtered orders
         return view('order.index', compact('order'));
     }
+    
     public function create()
     {
         return view('order.create');

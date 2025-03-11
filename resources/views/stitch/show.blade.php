@@ -19,6 +19,7 @@
                                 <th>Quantity</th>
                                 <th>Price</th>
                                 <th>Total Amount</th>
+                                <th>Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -28,6 +29,7 @@
                                     <td>{{ $material->stitching_quantity }}</td>
                                     <td>{{ number_format($material->stitching_price, 2) }}</td>
                                     <td>{{ number_format($material->total_amount, 2) }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($material->date)->format('d M Y') }}</td> <!-- Displaying formatted date -->
                                 </tr>
                             @endforeach
                         </tbody>

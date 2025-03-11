@@ -2,9 +2,9 @@
 
 @section('content')
 <div class="container mt-5">
-    <h2 class="mb-4">Edit Stitching</h2>
+    <h2 class="mb-4">Edit Printing Order</h2>
 
-    <form id="buyingForm" method="POST" action="{{ route('print.update', $printingOrder->id) }}">
+    <form id="printingForm" method="POST" action="{{ route('print.update', $printingOrder->id) }}">
         @csrf
         @method('PUT')
 
@@ -12,6 +12,12 @@
         <div class="mb-3">
             <label for="orderId" class="form-label">Order ID</label>
             <input type="text" class="form-control" id="orderId" name="orderId" value="{{ $printingOrder->orderId }}" required>
+        </div>
+
+        <!-- Date Field -->
+        <div class="mb-3">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" class="form-control" id="date" name="date" value="{{ $printingOrder->date }}" required>
         </div>
 
         <!-- Add Row Button -->
@@ -22,7 +28,7 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th> Type</th>
+                    <th>Type</th>
                     <th>Quantity</th>
                     <th>Price</th>
                     <th>Total Amount</th>
@@ -50,7 +56,7 @@
 
 <script>
     $(document).ready(function() {
-        let rowCount = {{ count($stitchingMaterials ?? []) }};
+        let rowCount = {{ count($printingMaterials ?? []) }};
 
         $("#addRow").click(function(e) {
             e.preventDefault();
@@ -58,7 +64,7 @@
 
             let newRow = `<tr id="row${rowCount}">
                             <td>${rowCount}</td>
-                            <td><input type="text" class="form-control" name="printing_type[]" placeholder="Enter Stitching Type" required></td>
+                            <td><input type="text" class="form-control" name="printing_type[]" placeholder="Enter Printing Type" required></td>
                             <td><input type="number" class="form-control quantity" name="printing_quantity[]" placeholder="Enter Quantity" min="1"></td>
                             <td><input type="number" class="form-control price" name="printing_price[]" placeholder="Enter Price" min="0" step="0.01"></td>
                             <td><input type="number" class="form-control total" name="total[]" placeholder="Total Amount" readonly></td>

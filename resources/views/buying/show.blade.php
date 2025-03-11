@@ -15,6 +15,7 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th>Date</th>
                                 <th>Material</th>
                                 <th>Quantity</th>
                                 <th>Unit</th>
@@ -24,6 +25,7 @@
                         </thead>
                         <tbody>
                             <tr>
+                                <td>{{ \Carbon\Carbon::parse($buying->date)->format('d-m-Y') }}</td>
                                 <td>{{ $buying->material }}</td>
                                 <td>{{ $buying->quantity }}</td>
                                 <td>{{ $buying->unit }}</td>
@@ -47,6 +49,10 @@
                         <tr>
                             <th>Order ID</th>
                             <td>{{ $order->id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date</th>
+                            <td>{{ \Carbon\Carbon::parse($buying->date)->format('d-m-Y') }}</td>
                         </tr>
                         <tr>
                             <th>Material</th>
@@ -92,7 +98,6 @@
             <a href="{{ route('delivery.create', ['orderId' => $order->id]) }}" class="btn btn-success">
                 <i class="fas fa-truck"></i> Proceed to Delivery
             </a>
-        
         </div>
 
         <!-- Back Button -->

@@ -10,4 +10,8 @@ class Delivery extends Model
     use HasFactory;
     protected $table = 'deliverys';
     protected $guarded = [];
+
+    protected $casts = [
+        'date' => 'datetime', // This tells Laravel to treat 'date' as a Carbon instance
+    ];
 }

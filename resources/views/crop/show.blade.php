@@ -3,7 +3,7 @@
 @section('content')
 <div class="container my-5">
 @if($cropping)
-    <h2 class="text-center mb-4 text-primary">Cropping Details for Order ID: {{ $cropping->orderId  }}</h2>
+    <h2 class="text-center mb-4 text-primary">Cropping Details for Order ID: {{ $cropping->orderId }}</h2>
         
     <!-- Cropping Order Details -->
     <div class="mb-4">
@@ -61,6 +61,10 @@
                     <tr>
                         <th>Total Amount</th>
                         <td>{{ number_format($cropping->total_amount, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date</th>
+                        <td>{{ \Carbon\Carbon::parse($cropping->date)->format('d-m-Y') }}</td>
                     </tr>
                 </table>
             </div>

@@ -5,7 +5,13 @@
 <div class="container mt-5">
     <h2 class="text-center mb-4">Cropping List</h2>
 
-    <!-- Add Buying Button -->
+    <!-- Search Bar -->
+    <form method="GET" action="{{ route('crop.index') }}" class="d-flex mb-4">
+        <input type="text" name="search" class="form-control" placeholder="Search by Cropping Type or Order ID" value="{{ request('search') }}">
+        <button type="submit" class="btn btn-primary ml-2">Search</button>
+    </form>
+
+    <!-- Add Cropping Button -->
     <div class="d-flex justify-content-between mb-4">
         <h4>
             <span class="text-muted fw-light">Cropping</span>
@@ -13,7 +19,7 @@
         <a class="btn btn-primary" href="{{ route('crop.create') }}">Add Cropping</a>
     </div>
 
-    <!-- Buying Table -->
+    <!-- Cropping Table -->
     <table class="table table-bordered table-hover">
         <thead>
             <tr>
@@ -23,10 +29,11 @@
                 <th>Cropping Quantity</th>
                 <th>Cropping Price</th>
                 <th>Total Amount</th>
-                
+                <th>Date</th>
                 <th>Action</th>
             </tr>
         </thead>
+
         <tbody>
             @forelse ($cropping as $index => $item)
                 <tr>
@@ -34,15 +41,10 @@
                     <td>{{ $item->orderId }}</td>
                     <td>{{ $item->cropping_type }}</td>
                     <td>{{ $item->cropping_quantity }}</td>
-              
                     <td>{{ $item->cropping_price }}</td>
                     <td>{{ $item->total_amount }}</td>
-                   
+                    <td>{{ \Carbon\Carbon::parse($item->date)->format('d-m-Y') }}</td>
                     <td>
-                        <!-- Edit Button -->
-                       
-
-                        <!-- Delete Button (if you want to allow deleting, you can implement it too) -->
                         <form method="post" action="{{ route('crop.destroy', $item->id) }}">
                             <a href="{{ route('crop.edit', $item->id) }}"> <i class="fa-solid fa-edit text-success"></i> </a>
                             <a href="{{ route('crop.show', $item->id) }}"> <i class="fa-solid fa-eye text-info"></i> </a>
@@ -66,7 +68,4 @@
     </div>
 </div>
 
-
-
 @endsection
-

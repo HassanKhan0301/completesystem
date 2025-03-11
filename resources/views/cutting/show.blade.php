@@ -19,6 +19,7 @@
                                 <th>Quantity</th>
                                 <th>Price</th>
                                 <th>Total Amount</th>
+                                <th>Date</th> <!-- Added Date Column -->
                             </tr>
                         </thead>
                         <tbody>
@@ -27,6 +28,7 @@
                                 <td>{{ $cutting->cutting_quantity }}</td>
                                 <td>{{ number_format($cutting->cutting_price, 2) }}</td>
                                 <td>{{ number_format($cutting->total_amount, 2) }}</td>
+                                <td>{{ \Carbon\Carbon::parse($cutting->date)->format('d-m-Y') }}</td> <!-- Formatted Date -->
                             </tr>
                         </tbody>
                     </table>
@@ -62,6 +64,10 @@
                             <th>Total Amount</th>
                             <td>{{ number_format($cutting->total_amount, 2) }}</td>
                         </tr>
+                        <tr>
+                            <th>Date</th>
+                            <td>{{ \Carbon\Carbon::parse($cutting->date)->format('d-m-Y') }}</td> <!-- Formatted Date -->
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -69,37 +75,24 @@
 
         <!-- Order-related Buttons -->
         <div class="mt-3 text-center">
-            <!-- Add to Buying -->
             <a href="{{ route('buying.create', ['orderId' => $cutting->orderId]) }}" class="btn btn-primary">
                 <i class="fas fa-cart-plus"></i> Add to Buying
             </a>
-
-            <!-- Add to Cropping -->
             <a href="{{ route('crop.create', ['orderId' => $cutting->orderId]) }}" class="btn btn-primary">
                 <i class="fas fa-seedling"></i> Add to Cropping
             </a>
-
-            <!-- Add to Cutting -->
             <a href="{{ route('cutting.create', ['orderId' => $cutting->orderId]) }}" class="btn btn-primary">
                 <i class="fas fa-cut"></i> Add to Cutting
             </a>
-
-            <!-- Add to Stitching -->
             <a href="{{ route('stitch.create', ['orderId' => $cutting->orderId]) }}" class="btn btn-primary">
                 <i class="fas fa-palette"></i> Add to Stitching
             </a>
-
-            <!-- Add to Printing -->
             <a href="{{ route('print.create', ['orderId' => $cutting->orderId]) }}" class="btn btn-primary">
                 <i class="fas fa-print"></i> Add to Printing
             </a>
-
-            <!-- Add to Packing -->
             <a href="{{ route('packing.create', ['orderId' => $cutting->orderId]) }}" class="btn btn-primary">
                 <i class="fas fa-box"></i> Add to Packing
             </a>
-
-            <!-- Proceed to Delivery -->
             <a href="{{ route('delivery.create', ['orderId' => $cutting->orderId]) }}" class="btn btn-success">
                 <i class="fas fa-truck"></i> Proceed to Delivery
             </a>

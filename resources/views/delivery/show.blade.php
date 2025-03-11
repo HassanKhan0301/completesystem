@@ -19,6 +19,7 @@
                                 <th>Quantity</th>
                                 <th>Price</th>
                                 <th>Total Amount</th>
+                                <th>Date</th>  <!-- Add Date Column -->
                             </tr>
                         </thead>
                         <tbody>
@@ -27,6 +28,7 @@
                                 <td>{{ $delivery->delivery_quantity }}</td>
                                 <td>{{ number_format($delivery->delivery_price, 2) }}</td>
                                 <td>{{ number_format($delivery->total_amount, 2) }}</td>
+                                <td>{{ \Carbon\Carbon::parse($delivery->date)->format('d-m-Y') }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -61,6 +63,10 @@
                         <tr>
                             <th>Total Amount</th>
                             <td>{{ number_format($delivery->total_amount, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date</th>  <!-- Add Date Field Here -->
+                            <td>{{ \Carbon\Carbon::parse($delivery->date)->format('d-m-Y') }}</td>  <!-- Display Date -->
                         </tr>
                     </table>
                 </div>
